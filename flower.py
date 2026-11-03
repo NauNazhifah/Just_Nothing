@@ -1,8 +1,9 @@
+
 import turtle
 import math
 import random
 
-random.seed(7) 
+random.seed(7)
 
 screen = turtle.Screen()
 screen.setup(width=800, height=480)
@@ -17,12 +18,12 @@ def stars():
         x = random.randint(-390, 390)
         y = random.randint(-230, 230)
         t.goto(x, y)
-        t.dot(random.randint(2, 5), "white")
+        t.dot(random.randint(2, 4), "white")
 
 def stem():
     t.penup()
     t.goto(0, 60)
-    t.pendown(-72)
+    t.setheading(-72)
     t.color("#2e9e5b")
     t.pensize(7)
     t.pendown()
@@ -33,7 +34,7 @@ def leaf(x, y, angle):
     t.goto(x, y)
     t.setheading(angle)
     t.pendown()
-    t.color("#7fe0a3" , "1f8a4c")
+    t.color("#7fe0a3", "#1f8a4c")
     t.pensize(2)
     t.begin_fill()
     t.circle(95, 60)
@@ -62,7 +63,7 @@ def bloom():
     ]
     for count, size, edge, fill in rings:
         shift = random.randint(0, 40)
-        for _ in range(count):
+        for i in range(count):
             t.penup()
             t.goto(0, 60)
             a = shift + i * 360 / count
@@ -76,11 +77,11 @@ def center():
     t.goto(0, 60)
     t.dot(26, "#ffd54a")
     for i in range(14):
-        a = math.redians(i * 360 / 14)
+        a = math.radians(i * 360 / 14)
         x = math.cos(a) * 20
         y = 60 + math.sin(a) * 20
         t.goto(x, y)
-        t.dot(5, "#ff9flc")
+        t.dot(5, "#ff9f1c")
 
 stars()
 stem()
