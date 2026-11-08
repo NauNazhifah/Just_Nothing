@@ -1,112 +1,121 @@
 
 import pygame
-import random
+import math
 
 pygame.init()
 
-# WINDOW
-WIDTH, HEIGHT = 720, 700
-SCALE = 14
+WIDTH, HEIGHT = 800, 700
+SCALE = 10
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Pixel Rose - Bloom")
+pygame.display.set_caption("Blooming Rose")
 
 clock = pygame.time.Clock()
 
-# COLOR PALETTE
-C = {
-    "D": (105, 12, 38),       # Shadow
-    "R": (190, 20, 55),       # Deep red
-    "r": (225, 35, 70),       # Red
-    "P": (250, 75, 115),      # Pink
-    "L": (255, 145, 175),     # Highlight
-    "Y": (255, 205, 115),     # Center
-    "G": (35, 115, 65),       # Dark green
-    "g": (55, 165, 85),       # Green
-    "H": (115, 205, 110),     # Leaf highlight
-}
+# Palette
+BG = (24, 20, 39)
+DARK = (100, 10, 35)
+RED = (185, 18, 48)
+ROSE = (230, 35, 70)
+PINK = (250, 85, 125)
+LIGHT = (255, 155, 180)
 
-BG = (25, 20, 39)
-BG_LIGHT = (43, 31, 60)
+GREEN_DARK = (30, 105, 55)
+GREEN = (45, 155, 75)
+GREEN_LIGHT = (105, 205, 110)
 
-# ROSE PIXEL DESIGN
-art = [
-    "          DDDDD          ",
-    "       DDDrrrPPDD        ",
-    "     DDRRrrrPPPrrD       ",
-    "    DRRRRRrrrPPrrrD      ",
-    "   DRRRPPPRRRrrrPrrD     ",
-    "  DRRRPPPPPRRrrrPrrrD    ",
-    "  DRRRRPPPRRRRrrrRRrD    ",
-    "   DRRRRRRRRRrrrRRRD     ",
-    "    DRRRRRRRRRRRRRD      ",
-    "      DRRRRRRRRRD        ",
-    "        DDDDDDD          ",
-    "           G             ",
-    "           G             ",
-    "      HHHggG             ",
-    "     HHHHggG             ",
-    "      HHHggG             ",
-    "           GGG           ",
-    "           GGGg          ",
-    "           GGGgg         ",
-    "           GGG           ",
-    "          GGG            ",
-    "         GGG  G          ",
-    "        GGG    GG        ",
-    "       GGG      GG       ",
-    "      GGG        G       ",
-]
+GOLD = (255, 220, 135)
 
-# CREATE PIXEL CANVAS
-ART_WIDTH = max(len(row) for row in art)
-ART_HEIGHT = len(art)
+# Small pixel canvas
+canvas = pygame.Surface((80, 65))
 
-canvas = pygame.Surface((ART_WIDTH, ART_HEIGHT))
+def rect(x, y, w, h, color):
+    pygame.draw.rect(canvas, color, (x, y, w, h))
 
-# SPARKLES
-sparkles = [
-    (3, 5), (21, 4), (1, 15),
-    (23, 16), (5, 22), (20, 24)
-]
-
-# DRAW ROSE
 def draw_rose():
     canvas.fill(BG)
 
-    for y, row in enumerate(art):
-        for x, char in enumerate(row):
-            if char in C:
-                pygame.draw.rect(
-                    canvas,
-                    C[char],
-                    (x, y, 1, 1)
-                )
+    # STEM
+    rect(39, 34, 3, 20, GREEN_DARK)
+    rect(40, 35, 1, 18, GREEN)
 
-# DRAW SPARKLES
+    # LEFT LEAF
+    rect(24, 38, 10, 2, GREEN_DARK)
+    rect(27, 35, 8, 3, GREEN)
+    rect(23, 40, 9, 2, GREEN)
+    rect(25, 37, 6, 2, GREEN_LIGHT)
+    rect(28, 34, 3, 2, GREEN_LIGHT)
+
+    # RIGHT LEAF
+    rect(44, 43, 10, 2, GREEN_DARK)
+    rect(44, 40, 8, 3, GREEN)
+    rect(47, 45, 8, 2, GREEN)
+    rect(47, 41, 5, 2, GREEN_LIGHT)
+
+    # OUTER PETALS
+    rect(22, 17, 8, 7, DARK)
+    rect(28, 12, 8, 10, RED)
+    rect(36, 10, 10, 12, ROSE)
+    rect(46, 13, 8, 10, RED)
+    rect(52, 18, 7, 7, DARK)
+
+    # LOWER PETALS
+    rect(25, 23, 10, 6, DARK)
+    rect(32, 25, 16, 6, RED)
+    rect(45, 23, 11, 6, DARK)
+    rect(29, 27, 22, 5, RED)
+
+    # INNER PETALS
+    rect(31, 15, 7, 9, PINK)
+    rect(37, 13, 8, 10, LIGHT)
+    rect(44, 16, 6, 8, PINK)
+
+    # PETAL FOLDS
+    rect(25, 20, 5, 3, ROSE)
+    rect(30, 25, 6, 2, PINK)
+    rect(48, 22, 6, 3, ROSE)
+    rect(40, 23, 5, 3, LIGHT)
+
+    # CENTER
+    rect(37, 18, 5, 5, RED)
+    rect(39, 17, 3, 4, PINK)
+    rect(40, 18, 2, 2, LIGHT)
+
+    # SMALL PETAL DETAILS
+    rect(33, 12, 3, 2, LIGHT)
+    rect(46, 14, 3, 2, PINK)
+    rect(28, 23, 3, 2, PINK)
+    rect(51, 24, 3, 2, ROSE)
+
+# SPARKLES
+sparkles = [
+    (13, 15), (65, 13),
+    (17, 30), (63, 32),
+    (30, 8), (55, 8)
+]
+
 def draw_sparkles(frame):
     for i, (x, y) in enumerate(sparkles):
-        if (frame // 10 + i) % 2 == 0:
-            color = (255, 220, 145)
-            pygame.draw.rect(canvas, color, (x, y, 1, 1))
-            pygame.draw.rect(canvas, color, (x - 1, y, 3, 1))
-            pygame.draw.rect(canvas, color, (x, y - 1, 1, 3))
+        if (frame // 12 + i) % 2 == 0:
+            rect(x, y, 1, 1, GOLD)
+            rect(x - 1, y, 3, 1, GOLD)
+            rect(x, y - 1, 1, 3, GOLD)
 
 # TEXT
-title_font = pygame.font.SysFont("consolas", 28, bold=True)
-small_font = pygame.font.SysFont("consolas", 17)
+font = pygame.font.SysFont("consolas", 27, bold=True)
+small = pygame.font.SysFont("consolas", 17)
 
-title = title_font.render(
+title = font.render(
     "A LITTLE ROSE FOR YOU",
     True, (255, 150, 180)
 )
 
-subtitle = small_font.render(
+subtitle = small.render(
     "MADE WITH LOVE",
-    True, (205, 170, 220)
+    True, (210, 170, 220)
 )
 
-# MAIN LOOP
+# LOOP
 running = True
 frame = 0
 
@@ -117,32 +126,24 @@ while running:
 
     screen.fill(BG)
 
-    # Background decoration
-    pygame.draw.rect(screen, BG_LIGHT, (0, 0, WIDTH, 5))
-    pygame.draw.rect(screen, BG_LIGHT, (0, HEIGHT - 5, WIDTH, 5))
-
     draw_rose()
     draw_sparkles(frame)
 
-    # Enlarge without blur
     enlarged = pygame.transform.scale(
         canvas,
-        (ART_WIDTH * SCALE, ART_HEIGHT * SCALE)
+        (800, 650)
     )
 
-    screen.blit(
-        enlarged,
-        ((WIDTH - enlarged.get_width()) // 2, 80)
-    )
+    screen.blit(enlarged, (0, 0))
 
     screen.blit(
         title,
-        (WIDTH // 2 - title.get_width() // 2, 550)
+        (WIDTH // 2 - title.get_width() // 2, 580)
     )
 
     screen.blit(
         subtitle,
-        (WIDTH // 2 - subtitle.get_width() // 2, 595)
+        (WIDTH // 2 - subtitle.get_width() // 2, 620)
     )
 
     pygame.display.flip()
