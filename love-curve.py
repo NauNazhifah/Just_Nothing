@@ -14,11 +14,11 @@ t.hideturtle()
 t.speed(0)
 t.pensize(2)
 
-N = 500
-layers = 50
+N = 50
+layers = 30
 
 for j in range(layers):
-    scale = 12 + j * 0.7
+    scale = 5 + j * 0.7
 
     t.pencolor(colorsys.hsv_to_rgb(j / layers, 1, 1))
 
