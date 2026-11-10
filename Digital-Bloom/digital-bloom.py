@@ -6,7 +6,7 @@ import random
 pygame.init()
 
 # ==========================================
-# 1. WINDOW SETTINGS
+# 1. WINDOW
 # ==========================================
 
 WIDTH = 900
@@ -17,48 +17,81 @@ pygame.display.set_caption("DIGITAL BLOOM")
 
 clock = pygame.time.Clock()
 
-# ==========================================
-# 2. COLORS
-# ==========================================
-
-BLACK = (5, 5, 12)
-VIOLET = (170, 80, 255)
-BLUE = (80, 150, 255)
+BLACK = (5, 4, 15)
 
 # ==========================================
-# 3. FLOWER SETTINGS
+# 2. FLOWER SETTINGS
 # ==========================================
 
 CENTER_X = WIDTH // 2
-CENTER_Y = HEIGHT // 2
+CENTER_Y = 310
 
+PETAL_COUNT = 8
 PETAL_SIZE = 190
-PARTICLE_COUNT = 2500
+PARTICLE_COUNT = 9000
 
 particles = []
+
+# ==========================================
+# 3. PARTICLE GENERATION
+# ==========================================
 
 for i in range(PARTICLE_COUNT):
 
     angle = random.uniform(0, math.tau)
-    distance = random.random()
 
-    radius = PETAL_SIZE * abs(math.cos(4 * angle)) * distance
+    # Rounded petal geometry
+    petal_shape = (
+        0.20 + 0.80 *
+        ((1 + math.cos(PETAL_COUNT * angle)) / 2) ** 1.4
+    )
+
+    max_radius = PETAL_SIZE * petal_shape
+
+    distance = math.sqrt(random.random())
+    radius = max_radius * distance
 
     x = CENTER_X + radius * math.cos(angle)
     y = CENTER_Y + radius * math.sin(angle)
 
-    color_mix = random.random()
+    # Violet to electric blue gradient
+    t = (math.sin(angle * 2 + radius * 0.015) + 1) / 2
 
-    color = (
-        int(VIOLET[0] * (1 - color_mix) + BLUE[0] * color_mix),
-        int(VIOLET[1] * (1 - color_mix) + BLUE[1] * color_mix),
-        int(VIOLET[2] * (1 - color_mix) + BLUE[2] * color_mix)
+    purple = (190, 105, 255)
+    blue = (75, 145, 255)
+
+    color = tuple(
+        int(purple[j] * (1 - t) + blue[j] * t)
+        for j in range(3)
     )
 
-    particles.append((x, y, color))
+    if random.random() < 0.12:
+        color = (230, 165, 255)
+
+    size = random.choice([1, 1, 2, 2, 2, 3])
+
+    particles.append((x, y, color, size))
 
 # ==========================================
-# 4. MAIN LOOP
+# 4. GLOW EFFECT
+# ==========================================
+
+glow = pygame.Surface(
+    (WIDTH, HEIGHT),
+    pygame.SRCALPHA
+)
+
+for x, y, color, size in particles:
+
+    pygame.draw.circle(
+        glow,
+        (*color, 22),
+        (int(x), int(y)),
+        5
+    )
+
+# ==========================================
+# 5. MAIN LOOP
 # ==========================================
 
 running = True
@@ -66,19 +99,52 @@ running = True
 while running:
 
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             running = False
 
     screen.fill(BLACK)
 
-    # Draw flower particles
-    for x, y, color in particles:
+    # Soft particle glow
+    screen.blit(
+        glow,
+        (0, 0),
+        special_flags=pygame.BLEND_ADD
+    )
+
+    # Main particles
+    for x, y, color, size in particles:
+
         pygame.draw.circle(
             screen,
             color,
             (int(x), int(y)),
-            2
+            size
         )
+
+    # ======================================
+    # FLOWER CENTER
+    # ======================================
+
+    pygame.draw.circle(
+        screen, (75, 35, 130),
+        (CENTER_X, CENTER_Y), 25
+    )
+
+    pygame.draw.circle(
+        screen, (150, 90, 255),
+        (CENTER_X, CENTER_Y), 15
+    )
+
+    pygame.draw.circle(
+        screen, (230, 195, 255),
+        (CENTER_X, CENTER_Y), 7
+    )
+
+    pygame.draw.circle(
+        screen, (255, 255, 255),
+        (CENTER_X, CENTER_Y), 3
+    )
 
     pygame.display.flip()
     clock.tick(60)
